@@ -19,6 +19,31 @@
     "threads": false
   },
   "retrieved_at_utc": "2026-07-29T16:20:42.223522+00:00",
+  "risk_free": {
+    "daily_rate_convention": "(quote / 100) / 252",
+    "field": "raw daily Close quote, annualized percent",
+    "gap_policy": "forward-fill from the most recent prior trading day; a gap over 10 consecutive trading days or a missing leading value fails validation",
+    "request": {
+      "auto_adjust": false,
+      "end_exclusive": "2026-01-01",
+      "interval": "1d",
+      "repair": false,
+      "start_inclusive": "2003-01-01",
+      "threads": false
+    },
+    "retrieved_at_utc": "2026-07-30T18:24:33.526393+00:00",
+    "ticker": "^IRX",
+    "validation": {
+      "content_sha256": "137d257897d54b966588040d0ae60c420850e54b1f2ec706f5ef5a56914175df",
+      "first_date": "2003-01-02",
+      "last_date": "2025-12-31",
+      "longest_gap_filled": 1,
+      "maximum_quote": 5.3480000495910645,
+      "minimum_quote": -0.10499999672174454,
+      "missing_before_fill": 6,
+      "rows": 5787
+    }
+  },
   "tickers": [
     "SHY",
     "IEF",

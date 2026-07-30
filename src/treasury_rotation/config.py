@@ -31,3 +31,17 @@ MAX_MISSING_FRACTION = 0.005
 MAX_ABSOLUTE_DAILY_RETURN = 0.20
 LATEST_ACCEPTABLE_FIRST_DATE = "2003-01-10"
 EARLIEST_ACCEPTABLE_LAST_DATE = "2025-12-20"
+
+# Risk-free series, contract v0.2.3 metric clarifications 3-5. The ticker and
+# the 10-consecutive-trading-day forward-fill limit are contract rules, not
+# tunable settings.
+RISK_FREE_TICKER = "^IRX"
+MAX_RISK_FREE_GAP_TRADING_DAYS = 10
+
+# Fail-closed plausibility alarm for the annualized percent quote, mirroring
+# MAX_ABSOLUTE_DAILY_RETURN: a breach stops the run for investigation. The
+# quote is a percentage, so 25.0 means a 25% annualized rate, far above any
+# three-month Treasury rate in the research range; small negatives occurred
+# historically and are allowed down to -1.0.
+MIN_RISK_FREE_QUOTE = -1.0
+MAX_RISK_FREE_QUOTE = 25.0

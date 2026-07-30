@@ -251,6 +251,22 @@ def build_manifest(
     }
 
 
+def preserve_risk_free_section(
+    manifest: dict[str, Any],
+    existing_manifest: dict[str, Any],
+) -> dict[str, Any]:
+    """Carry an existing risk-free entry through an ETF manifest rebuild.
+
+    The ETF pipeline rebuilds the manifest from scratch, so without this
+    step a price refresh would silently erase the fourth series' recorded
+    provenance.
+    """
+
+    if "risk_free" in existing_manifest:
+        manifest["risk_free"] = existing_manifest["risk_free"]
+    return manifest
+
+
 def prepare_dataset(
     repository_root: Path,
     *,
@@ -282,17 +298,20 @@ def prepare_dataset(
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     complete.to_parquet(cache_path, index=True)
 
+    existing_manifest: dict[str, Any] = {}
+    if manifest_path.exists():
+        existing_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     retrieved_at_utc: str | None = None
-    if not fetched_from_network and manifest_path.exists():
+    if not fetched_from_network:
         # Preserve the actual retrieval time when revalidating an unchanged
         # cache; recording the current run time would misstate data provenance.
-        existing_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         retrieved_at_utc = existing_manifest.get("retrieved_at_utc")
     manifest = build_manifest(
         report,
         contract_path,
         retrieved_at_utc=retrieved_at_utc,
     )
+    manifest = preserve_risk_free_section(manifest, existing_manifest)
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n",
