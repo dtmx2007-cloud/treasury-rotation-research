@@ -1,0 +1,40 @@
+{
+  "contract_sha256": "d8feaf6c3e4dda75a0b6544521f6678ed4406ed0ccf377c318051244985a917e",
+  "contract_version": "0.2.3",
+  "field": "auto-adjusted daily close",
+  "packages": {
+    "pandas": "2.3.3",
+    "pyarrow": "25.0.0",
+    "scipy": "1.18.0",
+    "yfinance": "1.5.2"
+  },
+  "provider": "Yahoo Finance via yfinance",
+  "provider_usage": "personal educational research; raw prices not distributed",
+  "request": {
+    "auto_adjust": true,
+    "end_exclusive": "2026-01-01",
+    "interval": "1d",
+    "repair": true,
+    "start_inclusive": "2003-01-01",
+    "threads": false
+  },
+  "retrieved_at_utc": "2026-07-29T16:20:42.223522+00:00",
+  "tickers": [
+    "SHY",
+    "IEF",
+    "TLT"
+  ],
+  "validation": {
+    "content_sha256": "33447af38aab27967b0ee71223c95cb0ffed6cedac00745246ea298c9ef71334",
+    "first_date": "2003-01-02",
+    "last_date": "2025-12-31",
+    "maximum_absolute_daily_return": 0.07519518902589906,
+    "maximum_missing_fraction": 0.0,
+    "missing_by_ticker": {
+      "IEF": 0,
+      "SHY": 0,
+      "TLT": 0
+    },
+    "rows": 5787
+  }
+}

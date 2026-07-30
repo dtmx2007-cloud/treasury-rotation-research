@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+.env
+
+# Historical prices are fetched for personal research and are not redistributed.
+data/cache/*
+!data/cache/.gitkeep
+
+# Session-handoff and coaching notes stay local; they are not part of the
+# public research artifact.
+HANDOFF.md

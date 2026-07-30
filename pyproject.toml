@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=80,<81"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "treasury-rotation-research"
+version = "0.2.3"
+description = "Preregistered educational research on Treasury ETF duration momentum."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "pandas==2.3.3",
+  "pyarrow==25.0.0",
+  "scipy==1.18.0",
+  "yfinance==1.5.2",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest==9.1.1",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
