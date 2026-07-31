@@ -99,3 +99,35 @@ Every future phase must:
 6. Remain explainable without Claude, Codex, or the editor open.
 7. Name what the new work displaces before it becomes active.
 
+## Phase 9: the complexity gradient, studied honestly
+
+Parked 2026-07-31, the morning after the development-period first look.
+Origin disclosed for integrity: this idea was proposed the night the
+first look disappointed, which is exactly when complexity ideas are
+least trustworthy. It waits here until the current artifact ships.
+
+The question: does added strategy complexity help or hurt in asset
+allocation, measured across a preregistered ladder of models? The
+current artifact already contains a four-rung gradient — hold IEF,
+quarterly equal weight, Phase 1 ranking, Phase 2 risk-adjusted ranking —
+and in development, Sharpe and Calmar fell monotonically as complexity
+rose. The report may state that observation; this phase would test it
+deliberately.
+
+Relevant literature: DeMiguel, Garlappi, and Uppal, "Optimal Versus
+Naive Diversification" (RFS 2009) — the 1/N result this project's own
+equal-weight benchmark row echoes.
+
+A legitimate version also requires a wider cross-section: three highly
+correlated Treasury ETFs are close to the narrowest playground a
+ranking rule can have, so any complexity study worth running would use
+a broader asset universe, which multiplies both the opportunity and the
+overfitting surface.
+
+Evidence required before this becomes active, beyond the standard rules
+below: every rung of the ladder preregistered before any rung is
+evaluated; genuinely untouched out-of-sample data for the ladder as a
+whole (the current project's test period is spent once and cannot serve
+it); and an explicit accounting of in-sample-fit inflation, since more
+complex models fit the past better mechanically and that improvement is
+arithmetic, not evidence.
