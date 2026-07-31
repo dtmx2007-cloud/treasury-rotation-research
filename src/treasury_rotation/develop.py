@@ -36,6 +36,7 @@ from treasury_rotation.config import (
     CONTRACT_VERSION,
     DEVELOPMENT_END,
     PRIMARY_COST_BPS,
+    SENSITIVITY_COSTS_BPS,
 )
 from treasury_rotation.data import DataValidationError, repository_root
 from treasury_rotation.metrics import summarize_performance
@@ -55,6 +56,11 @@ from treasury_rotation.signals import run_phase1, run_phase2
 # The fence. DEVELOPMENT_END comes from the frozen config, and nothing in
 # this module accepts a different date from anywhere.
 DEVELOPMENT_BOUNDARY = pd.Timestamp(DEVELOPMENT_END)
+
+# The only cost assumptions this runner will evaluate: the primary 10 bps
+# and the two contract-frozen sensitivities. An arbitrary cost level is a
+# tunable parameter, and this project does not have tunable parameters.
+ALLOWED_COST_BPS = (PRIMARY_COST_BPS,) + tuple(SENSITIVITY_COSTS_BPS)
 
 PORTFOLIO_LABELS = (
     "phase1_momentum",
@@ -80,6 +86,7 @@ class FirstLookResult:
     window_start: pd.Timestamp
     window_end: pd.Timestamp
     measured_days: int
+    cost_bps: int
     metrics: dict[str, dict[str, float]]
 
 
@@ -101,23 +108,36 @@ def development_slice(prices: pd.DataFrame) -> pd.DataFrame:
     return sliced
 
 
-def first_look(prices: pd.DataFrame, quotes: pd.Series) -> FirstLookResult:
+def first_look(
+    prices: pd.DataFrame,
+    quotes: pd.Series,
+    *,
+    cost_bps: int = PRIMARY_COST_BPS,
+) -> FirstLookResult:
     """Compute all six metrics for all four portfolios, development only.
 
     ``prices`` is the validated adjusted-close table (any range; it is
     fenced here) and ``quotes`` is the raw ^IRX quote series. Everything
     downstream shares one measured-return window, enforced by an explicit
     index-equality check rather than by trust.
+
+    ``cost_bps`` may only be the primary assumption or one of the two
+    contract-frozen sensitivities. Decisions never see costs, so every
+    cost level produces identical trades on identical dates; only the
+    toll per dollar traded changes.
     """
+
+    if cost_bps not in ALLOWED_COST_BPS:
+        raise DataValidationError(
+            f"{cost_bps} bps is not a contract cost assumption. The "
+            f"permitted levels are {sorted(ALLOWED_COST_BPS)}; costs are "
+            "frozen, not tunable."
+        )
 
     dev_prices = development_slice(prices)
 
-    phase1_decisions, phase1_sim = run_phase1(
-        dev_prices, cost_bps=PRIMARY_COST_BPS
-    )
-    _phase2_decisions, phase2_sim = run_phase2(
-        dev_prices, cost_bps=PRIMARY_COST_BPS
-    )
+    phase1_decisions, phase1_sim = run_phase1(dev_prices, cost_bps=cost_bps)
+    _phase2_decisions, phase2_sim = run_phase2(dev_prices, cost_bps=cost_bps)
 
     # Contract v0.2.1 clause 3: the measured-return window starts the
     # trading day after the first qualifying decision close, and the
@@ -129,9 +149,9 @@ def first_look(prices: pd.DataFrame, quotes: pd.Series) -> FirstLookResult:
     first_decision = phase1_decisions.targets.index[0]
     measured_returns = asset_returns.loc[asset_returns.index > first_decision]
 
-    ief_sim = run_buy_and_hold_ief(measured_returns, cost_bps=PRIMARY_COST_BPS)
+    ief_sim = run_buy_and_hold_ief(measured_returns, cost_bps=cost_bps)
     equal_weight_sim = run_quarterly_equal_weight(
-        measured_returns, cost_bps=PRIMARY_COST_BPS
+        measured_returns, cost_bps=cost_bps
     )
 
     simulations: dict[str, PortfolioSimulation] = {
@@ -165,6 +185,7 @@ def first_look(prices: pd.DataFrame, quotes: pd.Series) -> FirstLookResult:
         window_start=expected_index[0],
         window_end=expected_index[-1],
         measured_days=len(expected_index),
+        cost_bps=cost_bps,
         metrics=metrics,
     )
 
@@ -188,6 +209,11 @@ def format_report(result: FirstLookResult) -> str:
         "equal_weight_quarterly": "Eq weight",
     }
 
+    cost_label = (
+        "PRIMARY"
+        if result.cost_bps == PRIMARY_COST_BPS
+        else "LABELED SENSITIVITY"
+    )
     lines = [
         "Development-period first look: PASS",
         f"Contract version: {CONTRACT_VERSION}",
@@ -199,7 +225,10 @@ def format_report(result: FirstLookResult) -> str:
             f"({result.measured_days} trading days, identical for all four "
             "portfolios)"
         ),
-        f"Transaction costs: {PRIMARY_COST_BPS} bps per dollar traded",
+        (
+            f"Transaction costs: {result.cost_bps} bps per dollar traded "
+            f"[{cost_label}]"
+        ),
         f"Risk-free series: {RISK_FREE_TICKER}",
         "",
     ]
@@ -254,8 +283,17 @@ def main() -> None:
     quotes.index.name = "date"
     quotes.name = RISK_FREE_TICKER
 
-    result = first_look(prices, quotes)
-    print(format_report(result))
+    # Primary assumption first, then the two frozen sensitivities, clearly
+    # labeled. Contract sensitivity policy: these cannot replace the
+    # primary results or change the conclusion.
+    for cost_bps in (PRIMARY_COST_BPS, *SENSITIVITY_COSTS_BPS):
+        result = first_look(prices, quotes, cost_bps=cost_bps)
+        print(format_report(result))
+        print()
+    print(
+        "Sensitivity policy: the 5 and 20 bps tables are labeled "
+        "sensitivities and cannot replace the primary 10 bps results."
+    )
 
 
 if __name__ == "__main__":

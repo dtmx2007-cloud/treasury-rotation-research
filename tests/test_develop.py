@@ -110,6 +110,53 @@ def test_first_look_reports_all_six_metrics_per_portfolio() -> None:
         assert all(isinstance(value, float) for value in metrics.values())
 
 
+def test_first_look_rejects_non_contract_cost_levels() -> None:
+    from treasury_rotation.data import DataValidationError
+
+    with pytest.raises(DataValidationError):
+        first_look(
+            synthetic_prices(FULL_CALENDAR),
+            synthetic_quotes(FULL_CALENDAR),
+            cost_bps=7,
+        )
+
+
+def test_first_look_costs_change_tolls_not_trades() -> None:
+    prices = synthetic_prices(FULL_CALENDAR)
+    quotes = synthetic_quotes(FULL_CALENDAR)
+    results = {
+        bps: first_look(prices, quotes, cost_bps=bps) for bps in (5, 10, 20)
+    }
+
+    for label in (
+        "phase1_momentum",
+        "phase2_risk_adjusted",
+        "buy_and_hold_ief",
+        "equal_weight_quarterly",
+    ):
+        # Decisions never see costs, so turnover is identical at every
+        # cost level; only the toll per dollar traded changes.
+        turnovers = {
+            bps: results[bps].metrics[label]["annual_turnover"]
+            for bps in (5, 10, 20)
+        }
+        assert turnovers[5] == turnovers[10] == turnovers[20], label
+
+    # A trading portfolio keeps more wealth at a lower toll; buy-and-hold
+    # IEF never trades after the free initial allocation, so its CAGR is
+    # identical at every cost level.
+    equal_weight_cagr = {
+        bps: results[bps].metrics["equal_weight_quarterly"]["cagr"]
+        for bps in (5, 10, 20)
+    }
+    assert equal_weight_cagr[5] > equal_weight_cagr[20]
+    ief_cagr = {
+        bps: results[bps].metrics["buy_and_hold_ief"]["cagr"]
+        for bps in (5, 10, 20)
+    }
+    assert ief_cagr[5] == ief_cagr[10] == ief_cagr[20]
+
+
 def test_first_look_buy_and_hold_never_trades() -> None:
     result = first_look(
         synthetic_prices(FULL_CALENDAR),
