@@ -51,11 +51,12 @@ to its right.
 
 | # | Event | File | Commit | Preceded |
 |---|---|---|---|---|
-| 1 | Contract locked (v0.2.0 → v0.2.3) | `research_contract.md` | `TODO(Declan): hash from git log` | any performance number on any period |
-| 2 | Development first-look precommitment | `PRECOMMITMENT.md` | `TODO(Declan): verify 3801691 against git log` | the development table |
-| 3 | Validation precommitment | `VALIDATION_PRECOMMITMENT.md` | `a88376c` | the validation table |
-| 4 | Validation procedure preregistered | `validation_procedure.md` | `b1cde17` | the validation table |
-| 5 | Validation runner + 12 tests pushed | `src/…/validate.py`, tests | `cbf279d` | the single execution of the runner |
+| 1 | Public snapshot at contract v0.2.3 | `research_contract.md` | `693787c` (2026-07-30) | any performance number on any period |
+| 2 | Development first-look precommitment | `PRECOMMITMENT.md` | `fa1b9d7` (2026-07-30) | the development table |
+| 3 | Validation precommitment | `VALIDATION_PRECOMMITMENT.md` | `a88376c` (2026-07-31) | the validation table |
+| 4 | Validation procedure preregistered | `validation_procedure.md` | `b1cde17` (2026-07-31) | the validation table |
+| 5 | Validation runner + 12 tests pushed | `src/…/validate.py`, tests | `cbf279d` (2026-07-31) | the single execution of the runner |
+| 6 | Report skeleton + freeze declaration | `REPORT.md`, `FREEZE_DECLARATION.md` | `98a9821` (2026-08-03) | the locked-test table |
 
 `TODO(Declan): one paragraph, your words, on why the timestamps are the
 point — what a reader should conclude from the promise always predating
@@ -65,17 +66,27 @@ is the leak-prevention device.` **[DTM slot]**
 
 ## 4. Development period, 2003-2015
 
-`TODO(Declan): regenerate and paste the full development table here. The
-develop runner may be rerun freely — development results are already
-seen. From the repo root:`
+Primary table, 10 bps, 3,208 trading days (measured-return window
+2003-04-07 through 2015-12-31, identical for all four portfolios):
 
-```powershell
-& '.\.venv\Scripts\python.exe' -m treasury_rotation.develop
-```
+| Metric | Phase 1 | Phase 2 | Hold IEF | Eq weight |
+|---|---|---|---|---|
+| CAGR | 4.34% | 1.66% | 5.21% | 4.83% |
+| Annualized volatility | 10.69% | 6.53% | 6.94% | 7.17% |
+| Sharpe ratio | 0.333 | 0.091 | 0.584 | 0.517 |
+| Maximum drawdown | -20.06% | -13.97% | -10.40% | -13.08% |
+| Calmar ratio | 0.216 | 0.119 | 0.501 | 0.369 |
+| Annual turnover | 8.955 | 6.991 | 0.000 | 0.039 |
 
-Known anchors the pasted table must match: Phase 1 net CAGR 4.34%
-(gross ≈ 5.24% at a 0.90 pt/yr toll) vs IEF 5.21%; Phase 1 Calmar 0.216
-vs IEF 0.501.
+Labeled cost sensitivities: at 5 bps Phase 1 CAGR 4.81% (still trailing
+IEF at 5.21%), Phase 2 2.01%; at 20 bps Phase 1 3.41%, Phase 2 0.95%
+(Sharpe -0.016). Turnover is identical at every cost level because
+decisions never see costs.
+
+Table regenerated 2026-08-14 with the develop runner (rerunnable freely
+under the contract) in the pinned environment against the hash-validated
+cache; the run matched both preregistered anchors (Phase 1 net CAGR
+4.34%, Calmar 0.216).
 
 Narrative bullets to expand into prose:
 
