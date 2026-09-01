@@ -12,6 +12,10 @@ advice, connect to a live brokerage account, or contain a live-trading code path
 
 ## Current milestone
 
+**Status: the development and validation periods are executed and reported in**
+**[`REPORT.md`](REPORT.md). The 2021-2025 locked test is preregistered and has**
+**not been run.**
+
 Milestone 1 established data integrity. Milestone 2 added a benchmark engine.
 Milestone 3 added the Phase 1 raw-momentum signal. Milestone 4 added the
 Phase 2 risk-adjusted signal. Milestone 5 froze the six performance metrics
@@ -32,11 +36,17 @@ as contract v0.2.3 and implemented them. The code can:
   under the contract v0.2.3 mechanical clarifications.
 
 The engine and every metric function reject every date in the 2021-2025
-locked test period. No strategy performance has been calculated or viewed on
-historical data; signals and metrics are verified only against synthetic
-examples with known answers. The ^IRX risk-free series is named in the
-contract but its download pipeline is not implemented yet, so Sharpe cannot
-be computed on real data.
+locked test period, and that period remains unopened.
+
+Development (2003-2015) and validation (2016-2020) have been executed and
+written up. Each was preceded by a public precommitment commit, and the
+validation period was a single preregistered look, executed 2026-07-31 and
+not repeated; the commit-timestamp timeline is in
+[`REPORT.md`](REPORT.md) section 3. The result is the same on both periods:
+the momentum strategies trail buy-and-hold IEF net of costs, and transaction
+costs account for the entire net deficit, -0.87 pts/yr on development and
+-0.98 on validation. Full metric tables are in sections 4 and 5. The
+locked-test table in section 8 is deliberately empty.
 
 Ongoing-session working notes live in a local `HANDOFF.md` that is not part
 of the published artifact.
